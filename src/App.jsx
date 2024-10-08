@@ -74,11 +74,11 @@ export default function App() {
             </button>
 
             <div className="flex flex-row gap-x-2 text-center justify-center mt-4 mb-4">
-              <p className="text-xs text-gray-300">
+              <p className="text-xs text-white/30">
                 • • • • • • • • • • • • • • •
               </p>
               <p className="text-xs text-gray-500">Or sign in with</p>
-              <p className="text-xs text-gray-300">
+              <p className="text-xs text-white/30">
                 • • • • • • • • • • • • • •
               </p>
             </div>
