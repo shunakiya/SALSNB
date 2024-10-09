@@ -1,4 +1,6 @@
-import { LockKeyhole, Mail, DoorOpen } from "lucide-react";
+import Lock from "@mui/icons-material/Lock";
+import Mail from "@mui/icons-material/Mail";
+import DoorFront from "@mui/icons-material/DoorFront";
 import { useState } from "react";
 import googleIcon from "./assets/google.svg";
 import appleIcon from "./assets/apple.svg";
@@ -30,15 +32,17 @@ export default function App() {
       />
 
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div className="bg-white/50 backdrop-blur-md p-7 rounded-2xl shadow-2xl drop-shadow-xl w-96">
-          <div className="mb-4">
+        <div className="bg-white/50 backdrop-blur-md p-7 rounded-3xl shadow-2xl drop-shadow-xl w-96">
+          <div className="mb-5">
             <div className="flex justify-center mb-4">
-              <div className="rounded-lg shadow-2xl drop-shadow-xl border-transparent w-min p-3 bg-slate-200">
-                <DoorOpen />
-              </div>
+              <button>
+                <div className="rounded-lg shadow-2xl drop-shadow-xl border-transparent w-min p-3 bg-slate-200">
+                  <DoorFront />
+                </div>
+              </button>
             </div>
 
-            <header className="text-2xl font-semibold text-center mb-2">
+            <header className="text-2xl font-semibold text-center mb-1">
               iOpen
             </header>
 
@@ -48,47 +52,53 @@ export default function App() {
             </p>
           </div>
 
-          <div className="flex flex-col w-full gap-y-4">
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-5 w-5" />
+          <div className="flex flex-col w-full gap-y-2">
+            <div className="relative items-center">
+              <Mail
+                className="absolute left-[9px] top-1/2 transform -translate-y-1/2 text-gray-500"
+                sx={{ fontSize: 20 }}
+              />
               <input
                 type="text"
                 placeholder="Email"
-                className="w-full pl-10 pr-3 py-3 bg-[#EFF2F6] text-sm placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                className="w-full pl-9 pr-3 py-2 bg-[#EFF2F6] text-sm placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               />
             </div>
 
-            <div className="relative">
-              <LockKeyhole className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-5 w-5" />
+            <div className="relative items-center">
+              <Lock
+                className="absolute left-[9px] top-1/2 transform -translate-y-1/2 text-gray-500"
+                sx={{ fontSize: 20 }}
+              />
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full pl-10 pr-3 py-3 bg-[#EFF2F6] text-sm placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                className="w-full pl-9 pr-3 py-2 bg-[#EFF2F6] text-sm placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               />
             </div>
           </div>
 
           <div className="justify-center items-center text-center mt-4">
-            <button className="w-full bg-blue-600 text-white font-semibold rounded-lg py-2 transition-opacity duration-175 ease-in-out hover:opacity-85 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            <button className="w-full bg-blue-600 text-white font-semibold rounded-lg py-2 transition-opacity duration-125 ease-in-out hover:opacity-85 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
               Login
             </button>
 
             <div className="flex flex-row gap-x-2 text-center justify-center mt-4 mb-4">
-              <p className="text-xs text-white/30">
-                • • • • • • • • • • • • • • •
+              <p className="text-xs text-white/50">
+                • &nbsp; • &nbsp; • &nbsp; • &nbsp; • &nbsp; • &nbsp; • &nbsp; •
               </p>
               <p className="text-xs text-gray-500">Or sign in with</p>
-              <p className="text-xs text-white/30">
-                • • • • • • • • • • • • • •
+              <p className="text-xs text-white/50">
+                • &nbsp; • &nbsp; • &nbsp; • &nbsp; • &nbsp; • &nbsp; • &nbsp; •
               </p>
             </div>
 
             <div className="w-full justify-center flex gap-x-2">
-              <button className=" bg-white rounded-xl shadow-md border px-8 py-2 transition-opacity duration-175 ease-in-out hover:opacity-85 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+              <button className=" bg-white rounded-xl shadow-md border px-8 py-2 transition-opacity duration-125 ease-in-out hover:opacity-85 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                 <img src={googleIcon} className="w-5" />
               </button>
 
-              <button className=" bg-white rounded-xl shadow-md border px-8 py-2 transition-opacity duration-175 ease-in-out hover:opacity-85 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+              <button className=" bg-white rounded-xl shadow-md border px-8 py-2 transition-opacity duration-125 ease-in-out hover:opacity-85 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                 <img src={appleIcon} className="w-5" />
               </button>
             </div>
