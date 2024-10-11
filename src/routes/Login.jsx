@@ -2,20 +2,26 @@ import Lock from "@mui/icons-material/Lock";
 import Mail from "@mui/icons-material/Mail";
 import DoorFront from "@mui/icons-material/DoorFront";
 import { useState } from "react";
-import googleIcon from "./assets/google.svg";
-import appleIcon from "./assets/apple.svg";
+import { useNavigate } from "react-router-dom";
+import googleIcon from "../assets/google.svg";
+import appleIcon from "../assets/apple.svg";
 
-export default function App() {
+export default function Login() {
   const [test, setData] = useState(null);
 
-  const testFetch = async () => {
-    try {
-      const response = await fetch(`http://192.168.137.221:5000`);
-      const data = await response.json();
-      setData(data);
-    } catch (error) {
-      console.log("Error fetching data:", error);
-    }
+  // const testFetch = async () => {
+  //   try {
+  //     const response = await fetch(`http://192.168.137.221:5000`);
+  //     const data = await response.json();
+  //     setData(data);
+  //   } catch (error) {
+  //     console.log("Error fetching data:", error);
+  //   }
+  // };
+  const navigate = useNavigate();
+
+  const handleDoorClick = () => {
+    navigate("/home");
   };
 
   const bg = "https://i.imgur.com/qlXKnfB.png";
@@ -35,7 +41,7 @@ export default function App() {
         <div className="bg-white/50 backdrop-blur-md p-7 rounded-3xl shadow-2xl drop-shadow-xl w-96">
           <div className="mb-5">
             <div className="flex justify-center mb-4">
-              <button>
+              <button onClick={handleDoorClick}>
                 <div className="rounded-lg shadow-2xl drop-shadow-xl border-transparent w-min p-3 bg-slate-200">
                   <DoorFront />
                 </div>
