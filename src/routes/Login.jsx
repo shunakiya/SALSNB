@@ -1,7 +1,6 @@
-import Lock from "@mui/icons-material/Lock";
-import Mail from "@mui/icons-material/Mail";
-import DoorFront from "@mui/icons-material/DoorFront";
 import { useState } from "react";
+import { FaLock, FaDoorClosed } from "react-icons/fa";
+import { IoMdMail } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import googleIcon from "../assets/google.svg";
 import appleIcon from "../assets/apple.svg";
@@ -43,7 +42,7 @@ export default function Login() {
             <div className="flex justify-center mb-4">
               <button onClick={handleDoorClick}>
                 <div className="rounded-lg shadow-2xl drop-shadow-xl border-transparent w-min p-3 bg-slate-200">
-                  <DoorFront />
+                  <FaDoorClosed size={30} />
                 </div>
               </button>
             </div>
@@ -60,9 +59,9 @@ export default function Login() {
 
           <div className="flex flex-col w-full gap-y-2">
             <div className="relative items-center">
-              <Mail
+              <IoMdMail
                 className="absolute left-[9px] top-1/2 transform -translate-y-1/2 text-gray-500"
-                sx={{ fontSize: 20 }}
+                size={20}
               />
               <input
                 type="text"
@@ -72,9 +71,9 @@ export default function Login() {
             </div>
 
             <div className="relative items-center">
-              <Lock
-                className="absolute left-[9px] top-1/2 transform -translate-y-1/2 text-gray-500"
-                sx={{ fontSize: 20 }}
+              <FaLock
+                className="absolute left-[10px] top-1/2 transform -translate-y-1/2 text-gray-500"
+                size={18}
               />
               <input
                 type="password"
