@@ -5,7 +5,6 @@ import Login from "./routes/Login";
 import Home from "./routes/Home";
 import "./index.css";
 
-// routes
 const router = createBrowserRouter([
   {
     path: "/",
