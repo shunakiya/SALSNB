@@ -9,3 +9,5 @@ Useful links:
 4. Potentially useful links to get code working:
   a. https://docs.circuitpython.org/projects/fingerprint/en/latest/
   b. https://docs.circuitpython.org/projects/fingerprint/en/latest/examples.html
+  c. https://www.youtube.com/watch?v=3jvHIR80bMw
+  d. https://www.youtube.com/watch?v=vhzCTXsNjpg
