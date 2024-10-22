@@ -6,3 +6,6 @@ Useful links:
   a. https://github.com/donskytech/raspberrypi-projects/blob/master/solenoid_lock/solenoid_lock.py
 3. Fullstack Website:
   a. https://open-app-six.vercel.app/
+4. Potentially useful links to get code working:
+  a. https://docs.circuitpython.org/projects/fingerprint/en/latest/
+  b. https://docs.circuitpython.org/projects/fingerprint/en/latest/examples.html
