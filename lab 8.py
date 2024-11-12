@@ -1,112 +1,113 @@
-# relevant imports
 import PCF8591 as ADC
 import RPi.GPIO as GPIO
 import time
-import signal
 
-# pins for touch and dual rgb led
+# Pins for touch and dual RGB LED
 TouchPin = 11
 Rpin = 13
+Bpin = 15  # Added Blue LED pin for additional creative feature (optional)
 tmp = 0
 
-# pins for ultrasonic sensor
+# Pins for ultrasonic sensor
 TRIG = 33
 ECHO = 32
 
-# pins for photoresistor and pcf8591
+# Pins for photoresistor and PCF8591
 DO = 17
 GPIO.setmode(GPIO.BCM)
 
-# Global variables
-led_state = False
-motion_timer = None
+###########################################################################
 
 def setup():
-    # setup for dual rgb and touch sensor
+    # Setup for dual RGB and touch sensor
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(Rpin, GPIO.OUT)
+    GPIO.setup(Bpin, GPIO.OUT)  # Setup for Blue LED
     GPIO.setup(TouchPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
-    # setup for ultrasonic sensor
+    # Setup for ultrasonic sensor
     GPIO.setup(TRIG, GPIO.OUT)
     GPIO.setup(ECHO, GPIO.IN)
     
-    # set up for pcf8591 and photoresistor
+    # Setup for PCF8591 and photoresistor
     ADC.setup(0x48)
     GPIO.setup(DO, GPIO.IN)
 
-    # Setup interrupt for touch sensor
-    GPIO.add_event_detect(TouchPin, GPIO.FALLING, callback=touch_callback, bouncetime=300)
+###########################################################################
 
-def touch_callback(channel):
-    global led_state, motion_timer
-    led_state = not led_state
-    led(led_state)
-    print("LED turned", "on" if led_state else "off", "by touch")
-    if motion_timer:
-        motion_timer.cancel()
-        motion_timer = None
+# Function to control LED (on/off based on input)
+def led(x):
+    if x == 0:
+        GPIO.output(Rpin, GPIO.LOW)
+    elif x == 1:
+        GPIO.output(Rpin, GPIO.HIGH)
 
-def led(state):
-    GPIO.output(Rpin, state)
-
+# Function to check ambient light condition (darkness)
 def is_dark():
-    # Read light level from photoresistor
-    light_level = ADC.read(0)
-    # Adjust this threshold as needed
-    return light_level < 100  # Example threshold
+    return ADC.read(0) < 100  # Adjust threshold based on your photoresistor readings
 
+# Function to check motion using ultrasonic sensor
 def motion_detected():
-    dis = distance()
-    # Adjust this threshold as needed
-    return dis < 100  # Example: motion detected if distance less than 100 cm
+    distance = get_distance()
+    return distance < 50  # Motion detected if object is within 50 cm
 
-def auto_shutoff():
-    global led_state, motion_timer
-    led_state = False
-    led(led_state)
-    print("LED auto shut-off after 30 seconds")
-    motion_timer = None
-
-def distance():
-    GPIO.output(TRIG, 0)
+# Function to get distance from ultrasonic sensor
+def get_distance():
+    GPIO.output(TRIG, False)
     time.sleep(0.000002)
 
-    GPIO.output(TRIG, 1)
+    GPIO.output(TRIG, True)
     time.sleep(0.00001)
-    GPIO.output(TRIG, 0)
+    GPIO.output(TRIG, False)
 
     while GPIO.input(ECHO) == 0:
-        a = 0
-    time1 = time.time()
+        pulse_start = time.time()
+    
     while GPIO.input(ECHO) == 1:
-        a = 1
-    time2 = time.time()
+        pulse_end = time.time()
 
-    during = time2 - time1
-    return during * 340 / 2 * 100
+    pulse_duration = pulse_end - pulse_start
+    distance = pulse_duration * 17150  # Speed of sound = 343 m/s, convert to cm
+    return distance
 
+# Function to handle touch sensor input
+def handle_touch():
+    global tmp
+    touch_input = GPIO.input(TouchPin)
+    if touch_input != tmp:
+        if touch_input == 0:
+            print("Touch detected: Turning LED ON")
+            led(1)
+        elif touch_input == 1:
+            print("Touch detected: Turning LED OFF")
+            led(0)
+        tmp = touch_input
+
+# Main loop to run the nightlight features
 def loop():
-    global led_state, motion_timer
     while True:
-        if is_dark() and motion_detected() and not led_state:
-            led_state = True
-            led(led_state)
-            print("Motion detected in darkness, LED turned on")
-            if motion_timer:
-                motion_timer.cancel()
-            motion_timer = Timer(30, auto_shutoff)
-            motion_timer.start()
-        
-        time.sleep(0.1)  # Small delay to prevent CPU overuse
+        handle_touch()  # Check for touch input to control LED
 
+        if is_dark():  # If it's dark, check for motion
+            if motion_detected():
+                print("Motion detected in darkness: Turning LED ON")
+                led(1)
+                time.sleep(30)  # Keep the LED on for 30 seconds
+                led(0)
+                print("Auto shut-off after 30 seconds")
+
+        time.sleep(0.1)
+
+# Function to turn off LED and clean up GPIO
 def destroy():
-    GPIO.output(Rpin, GPIO.LOW)
+    led(0)  # Turn off LED
     GPIO.cleanup()
+
+###########################################################################
 
 if __name__ == '__main__':
     setup()
     try:
         loop()
-    except KeyboardInterrupt: 
+    except KeyboardInterrupt:
         destroy()
