@@ -1,7 +1,8 @@
-# relavant imports
+# relevant imports
 import PCF8591 as ADC
 import RPi.GPIO as GPIO
 import time
+import signal
 
 # pins for touch and dual rgb led
 TouchPin = 11
@@ -12,12 +13,13 @@ tmp = 0
 TRIG = 33
 ECHO = 32
 
-
 # pins for photoresistor and pcf8591
 DO = 17
 GPIO.setmode(GPIO.BCM)
 
-###########################################################################
+# Global variables
+led_state = False
+motion_timer = None
 
 def setup():
     # setup for dual rgb and touch sensor
@@ -25,62 +27,47 @@ def setup():
     GPIO.setup(Rpin, GPIO.OUT)
     GPIO.setup(TouchPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
-    # setup for ultraosnic sensor
+    # setup for ultrasonic sensor
     GPIO.setup(TRIG, GPIO.OUT)
     GPIO.setup(ECHO, GPIO.IN)
     
-    # set up for pcf8591 qand photoresistor
+    # set up for pcf8591 and photoresistor
     ADC.setup(0x48)
     GPIO.setup(DO, GPIO.IN)
 
-###########################################################################
+    # Setup interrupt for touch sensor
+    GPIO.add_event_detect(TouchPin, GPIO.FALLING, callback=touch_callback, bouncetime=300)
 
-# main program, starts here
-if __name__ == '__main__':
-    # running initial setup in the beginning of the program
+def touch_callback(channel):
+    global led_state, motion_timer
+    led_state = not led_state
+    led(led_state)
+    print("LED turned", "on" if led_state else "off", "by touch")
+    if motion_timer:
+        motion_timer.cancel()
+        motion_timer = None
 
-    setup()
-    
-    try:
-        loop()
-        
-    # if ctrl + c is pressed, terminals the program and ends
-    except KeyboardInterrupt: 
-        destroy()
+def led(state):
+    GPIO.output(Rpin, state)
 
-###########################################################################3
+def is_dark():
+    # Read light level from photoresistor
+    light_level = ADC.read(0)
+    # Adjust this threshold as needed
+    return light_level < 100  # Example threshold
 
-# function for led changing, defeault is off 
-def led(x):
-    if x == 0:
-        GPIO.output(Rpin, 0)
-    if x == 1:
-        GPIO.output(Rpin, 1)
+def motion_detected():
+    dis = distance()
+    # Adjust this threshold as needed
+    return dis < 100  # Example: motion detected if distance less than 100 cm
 
-# function for printing the touch detection, then turns on rgb led
-def print(x):
-    global tmp
-    
-    if x != tmp:
-        if x == 0:
-            print("turning off")
-            tmp = 0
-            
-        if x == 1:
-            print("detected")
-            time.sleep(5)
-            
-        tmp = x
+def auto_shutoff():
+    global led_state, motion_timer
+    led_state = False
+    led(led_state)
+    print("LED auto shut-off after 30 seconds")
+    motion_timer = None
 
-# function that's a while loop, constantly running the main program
-def loop():
-    while True:
-        if(DC.read(0) == 7):
-            print("bruh")
-        #led(GPIO.input(TouchPin))
-        #print(GPIO.input(TouchPin))
-
-# function for getting object distance and logic for calcualting cm
 def distance():
     GPIO.output(TRIG, 0)
     time.sleep(0.000002)
@@ -97,21 +84,29 @@ def distance():
     time2 = time.time()
 
     during = time2 - time1
-    return during * (340 / 2) * 100
+    return during * 340 / 2 * 100
 
-# function for returning the distaance of ultraosnic sensor
-def returnDistance():
+def loop():
+    global led_state, motion_timer
     while True:
-        dis = distance()
+        if is_dark() and motion_detected() and not led_state:
+            led_state = True
+            led(led_state)
+            print("Motion detected in darkness, LED turned on")
+            if motion_timer:
+                motion_timer.cancel()
+            motion_timer = Timer(30, auto_shutoff)
+            motion_timer.start()
         
-        time.sleep(0.1)
-        
-        if(dis >= 5):
-            return 1
-        
+        time.sleep(0.1)  # Small delay to prevent CPU overuse
 
-# function for turning off led and releasing resource
 def destroy():
-    GPIO.output(Rpin, GPIO.HIGH)
+    GPIO.output(Rpin, GPIO.LOW)
     GPIO.cleanup()
 
+if __name__ == '__main__':
+    setup()
+    try:
+        loop()
+    except KeyboardInterrupt: 
+        destroy()
