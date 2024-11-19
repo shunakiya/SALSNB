@@ -1,31 +1,38 @@
 import RPi.GPIO as GPIO
-from mfrc522 import SimpleMFRC522
-
-reader = SimpleMFRC522()
+import mfrc522
+import time
 
 relayPin = 23
 
-# initilization for relay
+# Set up GPIO mode to BCM
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(relayPin, GPIO.OUT)
 
-try:
-    id,  uid = reader.read()
-    print(id)
-    print(uid)
-    
-    GPIO.output(relayPin, 1)
-    time.sleep(1)
-    GPIO.output(relayPin, 0)
-    
-finally:
-    GPIO.cleanup()
+# Create an MFRC522 reader object
+reader = mfrc522.MFRC522()
 
-/home/pi/.local/lib/python3.7/site-packages/mfrc522/MFRC522.py:151: RuntimeWarning: This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.
-  GPIO.setup(pin_rst, GPIO.OUT)
-Traceback (most recent call last):
-  File "/home/pi/Desktop/project/rfid test/rfid_read.py", line 10, in <module>
-    GPIO.setmode(GPIO.BCM)
-ValueError: A different mode has already been set!
->>> 
+# variable for toggling loop
+isReading = True
+
+try:
+    while isReading:
+        # Check for a card
+        (status, TagType) = reader.MFRC522_Request(reader.PICC_REQIDL)
+
+        if status == reader.MI_OK:
+            # Get the UID of the card
+            (status, uid) = reader.MFRC522_Anticoll()
+
+            if status == reader.MI_OK:
+                result = ''.join(map(str, uid))
+                print(result)
+                
+                GPIO.output(relayPin, 1)
+                time.sleep(1)
+                GPIO.output(relayPin, 0)
+
+                isReading = False
+
+except KeyboardInterrupt:
+    GPIO.cleanup()
