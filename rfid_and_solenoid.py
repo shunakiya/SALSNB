@@ -12,11 +12,11 @@ GPIO.setup(relayPin, GPIO.OUT)
 # Create an MFRC522 reader object
 reader = mfrc522.MFRC522()
 
-# variable for toggling loop
-isReading = True
+# Variable to keep track of the solenoid state
+solenoid_state = False
 
 try:
-    while isReading:
+    while True:
         # Check for a card
         (status, TagType) = reader.MFRC522_Request(reader.PICC_REQIDL)
 
@@ -26,13 +26,17 @@ try:
 
             if status == reader.MI_OK:
                 result = ''.join(map(str, uid))
-                print(result)
+                print(f"Card detected. UID: {result}")
                 
-                GPIO.output(relayPin, 1)
+                # Toggle the solenoid state
+                solenoid_state = not solenoid_state
+                GPIO.output(relayPin, solenoid_state)
+                
+                print(f"Solenoid {'activated' if solenoid_state else 'deactivated'}")
+                
+                # Wait a bit to avoid multiple reads of the same card
                 time.sleep(1)
-                GPIO.output(relayPin, 0)
-
-                isReading = False
 
 except KeyboardInterrupt:
+    print("\nProgram terminated.")
     GPIO.cleanup()
