@@ -15,15 +15,7 @@ relayPin = 23
 
 # Fingerprint sensor setup
 uart = serial.Serial("/dev/ttyS0", baudrate=57600, timeout=1)
-
-try:  
-    finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
-    finger.soft_reset()
-except RuntimeError as e:
-    print(f"Error initializing fingerprint sensor: {e}")
-    GPIO.cleanup()
-    uart.close()
-    exit(1)
+finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
 
 # NFC reader setup
 reader = mfrc522.MFRC522()
@@ -39,6 +31,7 @@ GPIO.setup(relayPin, GPIO.OUT)
 solenoid_state = False
 
 #########################################################################
+
 def reset_fingerprint_sensor():
     """Reset the fingerprint sensor and reinitialize communication."""
     print("Resetting fingerprint sensor...")
@@ -47,6 +40,8 @@ def reset_fingerprint_sensor():
         time.sleep(1)
     except Exception as e:
         print(f"Error during sensor reset: {e}")
+
+#########################################################################
 
 def get_fingerprint():
     """Check for a valid fingerprint."""
@@ -87,7 +82,7 @@ def unlock_door():
     solenoid_state = not solenoid_state
     GPIO.output(relayPin, solenoid_state)
     print("Door unlocked!")
-    time.sleep(1)
+    time.sleep(1) 
 
 #########################################################################
 # Main program
@@ -99,12 +94,58 @@ try:
         isValidFingerprint = get_fingerprint()
 
         # Check NFC
-        rfid_tag = get_rfid()
+        #rfid_tag = get_rfid()
 
         # Validate and unlock door
-        if isValidFingerprint or (rfid_tag and rfid_tag in [card, tag]):
+        if isValidFingerprint: #or (rfid_tag and rfid_tag in [card, tag]):
             unlock_door()
 except KeyboardInterrupt:
     GPIO.cleanup()
     uart.close()
+    finger.close_uart()
     print("\nExiting program.")
+
+
+Waiting for fingerprint or NFC input...
+Waiting for fingerprint...
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Failed to get a valid fingerprint after 3 attempts.
+Waiting for fingerprint...
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Failed to get a valid fingerprint after 3 attempts.
+Waiting for fingerprint...
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Failed to get a valid fingerprint after 3 attempts.
+Waiting for fingerprint...
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
+Error during sensor reset: Failed to read data from sensor
+Error: Failed to read data from sensor. Retrying...
+Resetting fingerprint sensor...
