@@ -10,72 +10,118 @@ import mfrc522
 led = DigitalInOut(board.D13)
 led.direction = Direction.OUTPUT
 
-# Relay pin
+# relay pin
 relayPin = 23
 
-# Create an MFRC522 object and hard-coded UID's
+# fingerprint sensor setup
+uart = serial.Serial("/dev/ttyS0", baudrate=57600, timeout=1)
+
+try:  
+    finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
+    finger.soft_reset()
+    
+except RuntimeError as e:
+    print(f"Error initalizing fingerprint sensor: {e}")
+    
+    GPIO.cleanup()
+    uart.close()
+    finger.close_uart()
+    
+    print("\nExiting program.")
+    exit(1)
+    
+# NFC reader setup
 reader = mfrc522.MFRC522()
 tag = "2272152072510"
 card = "1632241652103"
 
-# Initialization for relay
+# relay setup
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(relayPin, GPIO.OUT)
 
-# Initializing fingerprint port
-uart = serial.Serial("/dev/ttyS0", baudrate=57600, timeout=1)
-
-# Variable to keep track of the solenoid state
+# solenoid state
 solenoid_state = False
 
-try:
-    # Attempt fingerprint initialization
-    finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
-    finger.soft_reset()  # Reset sensor at the start
-except RuntimeError as e:
-    print(f"Error initializing fingerprint sensor: {e}")
-    uart.close()
-    GPIO.cleanup()
-    exit(1)
-
+#########################################################################
 
 def get_fingerprint():
-    """Get a fingerprint image, template it, and see if it matches."""
-    print("Waiting for image...")
+    # check for a valid fingerprint
+    print("Waiting for fingerprint...")
+    
     while finger.get_image() != adafruit_fingerprint.OK:
         pass
-    print("Templating...")
+    
+    print("Templating fingerprint...")
+    
     if finger.image_2_tz(1) != adafruit_fingerprint.OK:
         return False
-    print("Searching...")
+    
+    print("Searching fingerprint database...")
+    
     if finger.finger_search() != adafruit_fingerprint.OK:
         return False
+    
     return True
 
+#########################################################################
 
-print("This program is used to test the fingerprint and NFC")
-print("Waiting for some type of input...")
+def get_rfid():
+    # check for a valid NFC uid
+    (status, TagType) = reader.MFRC522_Request(reader.PICC_REQIDL)
+    
+    if status == reader.MI_OK:
+        (status, uid) = reader.MFRC522_Anticoll()
+        
+        if status == reader.MI_OK:
+            return ''.join(map(str, uid))
+        
+    return None
+
+#########################################################################
+
+def unlock_door():
+    # activate the solenoid to unlock door
+    global solenoid_state
+    
+    solenoid_state = not solenoid_state
+    GPIO.output(relayPin, solenoid_state)
+    
+    print("Door unlocked!")
+    time.sleep(1)
+
+#########################################################################
+# main program
+
+print("Waiting for fingerprint or NFC input...")
 
 try:
-    (status, TagType) = reader.MFRC522_Request(reader.PICC_REQIDL)
+    while True:
+        # check fingerprint
+        isValidFingerprint = get_fingerprint()
 
-    isValidFingerprint = get_fingerprint()
+        # check nfc
+        rfid_tag = get_rfid()
 
-    if status == reader.MI_OK:
-        result = ''.join(map(str, uid))
-        print(f"UID: {result}")
+        # validate authentication and unlock door
+        if isValidFingerprint or (rfid_tag and rfid_tag in [card, tag]):
+            unlock_door()
 
-    if isValidFingerprint or ((str(result) == card or str(result) == tag)):
-        solenoid_state = not solenoid_state
-        GPIO.output(relayPin, solenoid_state)
-
-        print("Door opened!")
-
-        time.sleep(1)
 except KeyboardInterrupt:
     GPIO.cleanup()
-finally:
-    # Ensure UART and GPIO cleanup on program exit
     uart.close()
-    GPIO.cleanup()
+    finger.close_uart()
+    print("\nExiting program.")
+
+Waiting for fingerprint or NFC input...
+Waiting for fingerprint...
+Traceback (most recent call last):
+  File "/home/pi/Desktop/project/prod_code.py", line 101, in <module>
+    isValidFingerprint = get_fingerprint()
+  File "/home/pi/Desktop/project/prod_code.py", line 52, in get_fingerprint
+    while finger.get_image() != adafruit_fingerprint.OK:
+  File "/home/pi/.local/lib/python3.7/site-packages/adafruit_fingerprint.py", line 180, in get_image
+    return self._get_packet(12)[0]
+  File "/home/pi/.local/lib/python3.7/site-packages/adafruit_fingerprint.py", line 349, in _get_packet
+    raise RuntimeError("Failed to read data from sensor")
+RuntimeError: Failed to read data from sensor
