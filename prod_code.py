@@ -46,23 +46,27 @@ solenoid_state = False
 #########################################################################
 
 def get_fingerprint():
-    # check for a valid fingerprint
     print("Waiting for fingerprint...")
+    for attempt in range(3):  # Retry up to 3 times
+        try:
+            while finger.get_image() != adafruit_fingerprint.OK:
+                pass
+            
+            print("Templating fingerprint...")
+            if finger.image_2_tz(1) != adafruit_fingerprint.OK:
+                raise RuntimeError("Templating failed")
+            
+            print("Searching fingerprint database...")
+            if finger.finger_search() != adafruit_fingerprint.OK:
+                raise RuntimeError("Search failed")
+            
+            return True
+        except RuntimeError as e:
+            print(f"Error: {e}. Retrying...")
+            reset_fingerprint_sensor()
     
-    while finger.get_image() != adafruit_fingerprint.OK:
-        pass
-    
-    print("Templating fingerprint...")
-    
-    if finger.image_2_tz(1) != adafruit_fingerprint.OK:
-        return False
-    
-    print("Searching fingerprint database...")
-    
-    if finger.finger_search() != adafruit_fingerprint.OK:
-        return False
-    
-    return True
+    print("Failed to get a valid fingerprint.")
+    return False
 
 #########################################################################
 
