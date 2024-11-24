@@ -26,7 +26,7 @@ The Secure Access Lock System enhances the daily experience of locking and unloc
   - Remote control via a web-based application.
   - Hidden keyhole for traditional manual unlocking.
 - **Auto-Lock**: Automatically re-engages the lock after a preset period of inactivity.
-- **Multi-Platform Compatibility**: Works with both iOS and Android.
+- **Multi-Platform Compatibility**: Works with both iOS and Android (Web-based).
 
 ---
 
@@ -38,7 +38,7 @@ The Secure Access Lock System enhances the daily experience of locking and unloc
 3. **NFC Reader**: Allows unlocking using NFC-enabled devices or cards.
 4. **Solenoid Lock**: The mechanical locking mechanism controlled by the Raspberry Pi.
 5. **Relay**: Enables/disables the solenoid lock based on authentication signals.
-6. **Power Source**: Powered by 3 AA batteries, with a backup key for emergencies.
+6. **Power Source**: Powered by 6 AA batteries, with a backup key for emergencies.
 
 ### Inputs and Outputs
 | Component          | Input                                 | Output                          |
@@ -69,7 +69,7 @@ The Secure Access Lock System enhances the daily experience of locking and unloc
 ## Technical Details
 
 ### Power Supply
-- Primary: 3 AA batteries housed in a secure casing.
+- Primary: 6 AA batteries housed in a secure casing.
 - Backup: Manual key accessible behind the fingerprint sensor.
 
 ### Communication Protocols
@@ -81,31 +81,4 @@ The Secure Access Lock System enhances the daily experience of locking and unloc
 2. Raspberry Pi processes the input and signals the relay.
 3. Relay activates/deactivates the solenoid to lock/unlock the door.
 
----
 
-## Testing and Results
-
-| Test                   | Result                           |
-|------------------------|----------------------------------|
-| 9V battery for solenoid| Failed (insufficient power)     |
-| 3 AA batteries         | Success (adequate power)        |
-| Fingerprint recognition| Success (accurate and responsive) |
-| NFC tag/card testing   | Success (validated multiple tags/cards) |
-
-### Problem Areas
-- Initial power supply (9V battery) proved inadequate and was replaced with 3 AA batteries.
-- During testing, one AA battery exploded and was immediately replaced.
-
----
-
-## Marketing Studies
-- **Security Statistics**: 56% of home break-ins occur through doors. A secure smart lock system acts as a deterrent.
-- **User Convenience**: 70% of people forget to lock their doors occasionally; remote control mitigates this issue.
-- **Accessibility**: Enhances life for the 42.5 million Americans with disabilities.
-
----
-
-## Future Improvements
-- Integrating advanced power management.
-- Refining mechanical components for enhanced durability.
-- Expanding features to support voice assistants.
