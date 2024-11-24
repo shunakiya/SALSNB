@@ -47,7 +47,7 @@ The Secure Access Lock System enhances the daily experience of locking and unloc
 | Fingerprint Sensor  | User fingerprint                     | Authentication result          |
 | NFC Reader          | NFC tag/card proximity               | Authentication result          |
 | Solenoid Lock       | Power from relay                     | Physical lock/unlock           |
-| 3 AA Batteries      | N/A                                  | Power for system components    |
+| 6 AA Batteries      | N/A                                  | Power for system components    |
 
 ---
 
