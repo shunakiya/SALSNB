@@ -22,9 +22,9 @@ The Secure Access Lock System enhances the daily experience of locking and unloc
   - Fingerprint sensor for biometric access.
   - NFC cards/tags for quick, contactless unlocking.
   - Remote control via a web-based application.
-  - Hidden keyhole for traditional manual unlocking.
+  - Keyhole for traditional manual unlocking.
 - **Auto-Lock**: Automatically re-engages the lock after a preset period of inactivity.
-- **Multi-Platform Compatibility**: Works with both iOS and Android (Web-based).
+- **Multi-Platform Compatibility**: Works with both Mobile and Web (Web-based).
 
 ## System Design
 
