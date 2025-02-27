@@ -12,7 +12,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(relayPin, GPIO.OUT)
 
 
-# varialbe to store solenoid state
+# Varialbe to store solenoid state
 solenoid_state = False
 
 uart = serial.Serial("/dev/ttyS0", baudrate=57600, timeout=1)
