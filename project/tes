@@ -1,0 +1,16 @@
+import RPi.GPIO as GPIO
+import time
+
+relayPin = 23
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(relayPin, GPIO.OUT)
+
+print("Activating relay...")
+GPIO.output(relayPin, GPIO.LOW)  # LOW to turn ON relay
+time.sleep(5)
+
+print("Deactivating relay...")
+GPIO.output(relayPin, GPIO.HIGH)  # HIGH to turn OFF relay
+
+GPIO.cleanup()
