@@ -1,0 +1,48 @@
+import serial
+import time
+import adafruit_fingerprint
+import RPi.GPIO as GPIO
+
+relayPin = 23
+
+# Set up GPIO mode to BCM
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(relayPin, GPIO.OUT)
+
+# Variable to keep track of the solenoid state
+solenoid_state = False
+
+# Initialize fingerprint sensor
+finger_uart = serial.Serial("/dev/serial0", baudrate=57600, timeout=1)
+finger = adafruit_fingerprint.Adafruit_Fingerprint(finger_uart)
+
+# Ensure fingerprint sensor is reset and ready
+finger.soft_reset()
+
+def toggle_solenoid():
+    global solenoid_state
+    solenoid_state = not solenoid_state
+    GPIO.output(relayPin, solenoid_state)
+    print(f"Solenoid {'ENABLED' if solenoid_state else 'DISABLED'}")
+
+def check_fingerprint():
+    if finger.get_image() != adafruit_fingerprint.OK:
+        return
+    if finger.image_2_tz(1) != adafruit_fingerprint.OK:
+        return
+    if finger.finger_search() != adafruit_fingerprint.OK:
+        print("[FINGER] No match found.")
+        return
+    print(f"[FINGER] Match! ID #{finger.finger_id}")
+    toggle_solenoid()
+
+try:
+    while True:
+        # Check for a fingerprint scan
+        check_fingerprint()
+
+except KeyboardInterrupt:
+    print("\nProgram terminated.")
+    GPIO.cleanup()
+    finger_uart.close()  # Close the UART after fingerprint usage
